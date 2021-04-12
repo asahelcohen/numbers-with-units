@@ -1,7 +1,9 @@
 #pragma once
 #include <string>
 #include <iostream>
-#include <vector>
+#include <fstream>
+#include <sstream>
+
 
 namespace ariel
 {
@@ -9,19 +11,19 @@ namespace ariel
     {
     private:
         double num;
-        string type;
+        std::string type;
 
     public:
-        NumberWithUnits(){};
-
-        void read_units(); //reads
+        NumberWithUnits(double d, std::string typo);
+        
+        static void read_units(std::ifstream&);
 
         friend NumberWithUnits operator+(NumberWithUnits &a, NumberWithUnits &b);
         friend NumberWithUnits operator-(NumberWithUnits &a, NumberWithUnits &b);
-        NumberWithUnits operator+=(const NumberWithUnits &a);
-        NumberWithUnits operator-=(const NumberWithUnits &a);
-        NumberWithUnits operator+(NumberWithUnits &a);
-        NumberWithUnits operator-(NumberWithUnits &a);
+        NumberWithUnits& operator+=(const NumberWithUnits &a);
+        NumberWithUnits& operator-=(const NumberWithUnits &a);
+        friend NumberWithUnits operator+(const NumberWithUnits &a);
+        friend NumberWithUnits operator-(const NumberWithUnits &a);
 
         bool operator==(const NumberWithUnits &a) const;
         bool operator!=(const NumberWithUnits &a) const;
