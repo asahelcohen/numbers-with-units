@@ -302,3 +302,45 @@ TEST_CASE("operator=/!=/</> basic")
     CHECK(m1 == -m11);
     CHECK(cm1 == -cm11);
 }
+
+TEST_CASE("operator++/--")
+{
+    // prefix  - --a
+    CHECK(--km1 != km1--);
+    NumberWithUnits temp = NumberWithUnits(507, "m");
+    CHECK(--m1 == temp);
+    temp = NumberWithUnits(1093, "sec");
+    CHECK(--sec1 == temp);
+    temp = NumberWithUnits(6013, "cm");
+    CHECK(--cm1 == temp);
+    // postfix - a--
+    temp = NumberWithUnits(78, "kg");
+    CHECK(kg1-- == kg1);
+    CHECK(kg1 != kg1);
+    temp = NumberWithUnits(1073, "g");
+    CHECK(g1-- == g1);
+    CHECK(kg1 != kg1);
+    temp = NumberWithUnits(74, "ton");
+    CHECK(t1-- != t1);
+    temp = NumberWithUnits(23, "hour");
+    CHECK(h1-- != h1);
+    // prefix  - ++a
+    CHECK(++km1 != km1++);
+    temp = NumberWithUnits(508, "m");
+    CHECK(++m1 == temp);
+    temp = NumberWithUnits(1094, "sec");
+    CHECK(++sec1 == temp);
+    temp = NumberWithUnits(6014, "cm");
+    CHECK(++cm1 == temp);
+    // postfix - a++
+    temp = NumberWithUnits(77, "kg");
+    CHECK(kg1++ == kg1);
+    CHECK(kg1 != kg1);
+    temp = NumberWithUnits(1072, "g");
+    CHECK(g1++ == g1);
+    CHECK(kg1 != kg1);
+    temp = NumberWithUnits(73, "ton");
+    CHECK(t1++ != t1);
+    temp = NumberWithUnits(22, "hour");
+    CHECK(h1++ != h1);
+}
