@@ -227,7 +227,7 @@ TEST_CASE("operator-= basic")
     il3 = il3 + il2;
 }
 
-TEST_CASE("operator+ basic")
+TEST_CASE("operator+")
 {
     CHECK(+km1 == km1);
     CHECK(+m1 == m1);
@@ -254,7 +254,7 @@ TEST_CASE("operator+ basic")
     CHECK(+il11 == il11);
 }
 
-TEST_CASE("operator- basic")
+TEST_CASE("operator-")
 {
     CHECK(-km1 == km11);
     CHECK(-m1 == m11);
@@ -343,4 +343,150 @@ TEST_CASE("operator++/--")
     CHECK(t1++ != t1);
     temp = NumberWithUnits(22, "hour");
     CHECK(h1++ != h1);
+}
+
+TEST_CASE("throw")
+{
+    EXPECT_THROW(km1 + g1);
+    EXPECT_THROW(il2 + g1);
+    EXPECT_THROW(km1 + us3);
+    EXPECT_THROW(m1 + g1);
+    EXPECT_THROW(cm2 + t1);
+    EXPECT_THROW(km1 + g1);
+    EXPECT_THROW(h1 + t1);
+}
+
+TEST_CASE("operator+ mix")
+{
+    NumberWithUnits temp = NumberWithUnits(586.14, "m");
+    CHECK(m1 + cm1 == temp);
+    temp = NumberWithUnits(56814, "cm");
+    CHECK(cm1 + m1 == temp);
+    temp = NumberWithUnits(880.94, "ILS");
+    CHECK(il1 + us2 == temp);
+    temp = NumberWithUnits(79.479, "kg");
+    CHECK(kg1 + g3 == temp);
+    temp = NumberWithUnits(2.02081, "km");
+    CHECK(km2 + cm2 == temp);
+    temp = NumberWithUnits(127094, "sec");
+    CHECK(sec1 + h3) == temp;
+    temp = NumberWithUnits(81.001073, "ton");
+    CHECK(t3 + g1 == temp);
+    temp = NumberWithUnits(81001073, "g");
+    CHECK(g1 + t3 == temp);
+}
+
+TEST_CASE("operator- mix")
+{
+    NumberWithUnits temp = NumberWithUnits(447.86, "m");
+    CHECK(m1 - cm1 == temp);
+    temp = NumberWithUnits(-44786, "cm");
+    CHECK(cm1 - m1 == temp);
+    temp = NumberWithUnits(761.06, "ILS");
+    CHECK(il1 - us2 == temp);
+    temp = NumberWithUnits(76.521, "kg");
+    CHECK(kg1 - g3 == temp);
+    temp = NumberWithUnits(1.97919, "km");
+    CHECK(km2 - cm2 == temp);
+    temp = NumberWithUnits(-124906, "sec");
+    CHECK(sec1 - h3) == temp;
+    temp = NumberWithUnits(80.998927, "ton");
+    CHECK(t3 - g1 == temp);
+    temp = NumberWithUnits(-80998927, "g");
+    CHECK(g1 - t3 == temp);  
+}
+
+TEST_CASE("operator+= mix")
+{
+    NumberWithUnits temp = NumberWithUnits(586.14, "m");
+    m1 += cm1;
+    CHECK(m1 == temp);
+    m1 = m1 - cm1;
+    temp = NumberWithUnits(56814, "cm");
+    cm1 += m1;
+    CHECK(cm1 == temp);
+    cm1 = cm1 - m1;
+    temp = NumberWithUnits(880.94, "ILS");
+    il1 += us2;
+    CHECK(il1 == temp);
+    il1 = il1 - us2;
+    temp = NumberWithUnits(79.479, "kg");
+    kg1 += g3;
+    CHECK(kg1 == temp);
+    kg1 = kg1 - g3;
+    temp = NumberWithUnits(2.02081, "km");
+    km2 += cm2;
+    CHECK(km2 == temp);
+    km2 = km2 - cm2;
+    temp = NumberWithUnits(127094, "sec");
+    sec1 += h3;
+    CHECK(sec1 == temp);
+    sec1 = sec1 - h3;
+    temp = NumberWithUnits(81.001073, "ton");
+    t3 += g1;
+    CHECK(t3 == temp);
+    t3 = t3 - g1;
+    temp = NumberWithUnits(81001073, "g");
+    g1 += t3;
+    CHECK(g1 == temp);
+    g1 = g1 - t3;
+}
+
+TEST_CASE("operator-= mix")
+{
+    NumberWithUnits temp = NumberWithUnits(447.86, "m");
+    m1 -= cm1;
+    CHECK(m1 == temp);
+    m1 = m1 + cm1;
+    temp = NumberWithUnits(-44786, "cm");
+    cm1 -= m1;
+    CHECK(cm1 == temp);
+    cm1 = cm1 + m1;
+    temp = NumberWithUnits(761.06, "ILS");
+    il1 -= us2;
+    CHECK(il1 == temp);
+    il1 = il1 + us2;
+    temp = NumberWithUnits(76.521, "kg");
+    kg1 -= g3;
+    CHECK(kg1 == temp);
+    kg1 = kg1 + g3;
+    temp = NumberWithUnits(1.97919, "km");
+    km2 -= cm2;
+    CHECK(km2 == temp);
+    km2 = km2 + cm2;
+    temp = NumberWithUnits(-124906, "sec");
+    sec1 -= h3;
+    CHECK(sec1 == temp);
+    sec1 = sec1 + h3;
+    temp = NumberWithUnits(80.998927, "ton");
+    t3 -= g1;
+    CHECK(t3 == temp);
+    t3 = t3 + g1;
+    temp = NumberWithUnits(-80998927, "g");
+    g1 -= t3;
+    CHECK(g1 == temp);
+    g1 = g1 + t3;
+}
+
+TEST_CASE("operator=/!=/</> mix")
+{
+    CHECK(km1 != cm1);
+    CHECK(m1 != km2);
+    CHECK(sec1 != h3);
+    CHECK(g31 <= t1);
+    CHECK(-t1 <= kg1);
+    CHECK(g2 <= kg1);
+    CHECK(t1 >= kg1);
+    CHECK(h1 >= min2);
+    CHECK(min2 >= -h1);
+    CHECK(min3 > sec11);
+    CHECK(il1 > us2);
+    CHECK(m2 < m1);
+    CHECK(cm11 < cm2);
+    NumberWithUnits temp = NumberWithUnits(6000, "m");
+    CHECK(km1 == temp);
+    NumberWithUnits temp = NumberWithUnits(0.003, "ton");
+    CHECK(kg2 == temp);
+    NumberWithUnits temp = NumberWithUnits(7920, "min");
+    CHECK(h1 == temp);
 }
