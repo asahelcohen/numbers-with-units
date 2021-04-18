@@ -490,3 +490,52 @@ TEST_CASE("operator=/!=/</> mix")
     NumberWithUnits temp = NumberWithUnits(7920, "min");
     CHECK(h1 == temp);
 }
+
+TEST_CASE("operator*")
+{
+    NumberWithUnits temp = NumberWithUnits(15, "km");
+    CHECK(km1 * 2.5 == temp);
+    NumberWithUnits temp = NumberWithUnits(1727.2, "m");
+    CHECK(m1 * 3.4 == temp);
+    NumberWithUnits temp = NumberWithUnits(31272.2, "cm");
+    CHECK(cm1 * 5.2 == temp);
+    NumberWithUnits temp = NumberWithUnits(1222.5, "ton");
+    CHECK(t1 * 16.3 == temp);
+    NumberWithUnits temp = NumberWithUnits(694.2, "kg");
+    CHECK(kg1 * 8.9 == temp);
+    NumberWithUnits temp = NumberWithUnits(10515.4, "g");
+    CHECK(g1 * 9.8 == temp);
+    NumberWithUnits temp = NumberWithUnits(124.8, "hour");
+    CHECK(h1 * 5.2 == temp);
+    NumberWithUnits temp = NumberWithUnits(1782, "min");
+    CHECK(min1 * 13.5 == temp);
+    NumberWithUnits temp = NumberWithUnits(2188, "sec");
+    CHECK(sec1 * 2 == temp);
+    NumberWithUnits temp = NumberWithUnits(2073.6, "USD");
+    CHECK(us1 * 25.6 == temp);
+    NumberWithUnits temp = NumberWithUnits(24219.5, "ILS");
+    CHECK(il1 * 29.5 == temp);
+
+    NumberWithUnits temp = NumberWithUnits(15, "km");
+    CHECK(2.5 * km1 == temp);
+    NumberWithUnits temp = NumberWithUnits(1727.2, "m");
+    CHECK(3.4 * m1 == temp);
+    NumberWithUnits temp = NumberWithUnits(31272.2, "cm");
+    CHECK5.2 * cm1 == temp);
+    NumberWithUnits temp = NumberWithUnits(1222.5, "ton");
+    CHECK(16.3 * t1 == temp);
+    NumberWithUnits temp = NumberWithUnits(694.2, "kg");
+    CHECK(8.9 * kg1 == temp);
+    NumberWithUnits temp = NumberWithUnits(10515.4, "g");
+    CHECK(9.8 * g1 == temp);
+    NumberWithUnits temp = NumberWithUnits(124.8, "hour");
+    CHECK(5.2 * h1 == temp);
+    NumberWithUnits temp = NumberWithUnits(1782, "min");
+    CHECK(13.5 * min1 == temp);
+    NumberWithUnits temp = NumberWithUnits(2188, "sec");
+    CHECK(2 * sec1 == temp);
+    NumberWithUnits temp = NumberWithUnits(2073.6, "USD");
+    CHECK(25.6 * us1 == temp);
+    NumberWithUnits temp = NumberWithUnits(24219.5, "ILS");
+    CHECK(29.5 * il1 == temp);
+}
