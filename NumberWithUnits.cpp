@@ -40,41 +40,57 @@ namespace ariel
         }
         
         int l = tempVector.size();
+
         for(int i = 0; i < l; i + 5){
-            double rate = std::stod (rates[i+3]);
+            double rate = std::stod (tempVector[i+3]);
             double rate1 = 1/ rate;
+            string bUnit = tempVector[i+1];
+            string sUnit = tempVector[i+4];
 
             //2 new units
-            if((rates.find(tempVector[i+1]) == end) && (rates.find(tempVector[i+4]) == end)){
-                rates.insert(make_pair(tempVector[i+1], map<string, double>()));
-                rates[i+1].insert(make_pair(tempVector[i+4], rate));
+            if((rates.find(bUnit) == end) && (rates.find(sUnit) == end)){
+                rates.insert(make_pair(bUnit, map<string, double>()));
+                rates[bUnit].insert(make_pair(sUnit, rate));
 
-                rates.insert(make_pair(tempVector[i+4], map<string, double>()));
-                rates[i+1].insert(make_pair(tempVector[i+1], rate1)));
+                rates.insert(make_pair(sUnit, map<string, double>()));
+                rates[bUnit].insert(make_pair(bUnit, rate1)));
             }
 
             //1 new units
-            if(!(rates.find(tempVector[i+1]) == end) && (rates.find(tempVector[i+4]) == end)){
-                rates[i+1].insert(make_pair(tempVector[i+4], rate));
+            if(!(rates.find(bUnit) == end) && (rates.find(sUnit) == end)){
+                rates[bUnit].insert(make_pair(sUnit, rate));
 
-                rates.insert(make_pair(tempVector[i+4], map<string, double>()));
-                for (itr = rates[i+1].begin(); itr != rates[i+1].end(); itr++) {
-                    rates[i+4].insert(make_pair(itr->first, (itr->second*rate1))));
-                    rates[itr->first].insert(make_pair(rates[i+4], (itr->second*rate)));
+                rates.insert(make_pair(sUnit, map<string, double>()));
+                for (itr = rates[bUnit].begin(); itr != rates[bUnit].end(); itr++) {
+                    rates[sUnit].insert(make_pair(itr->first, (itr->second*rate1))));
+                    rates[itr->first].insert(make_pair(rates[sUnit], (itr->second*rate)));
                 }
             }
 
 
-            if((rates.find(tempVector[i+1]) == end) && !(rates.find(tempVector[i+4]) == end)){
-                rates[i+1].insert(make_pair(tempVector[i+1], rate1));
+            if((rates.find(bUnit) == end) && !(rates.find(sUnit) == end)){
+                rates[bUnit].insert(make_pair(bUnit, rate1));
 
-                rates.insert(make_pair(tempVector[i+1], map<string, double>()));
-                for (itr = rates[i+4].begin(); itr != rates[i+3].end(); itr++) {
-                    rates[i+1].insert(make_pair(itr->first, (itr->second*rate))));
-                    rates[itr->first].insert(make_pair(rates[i+1], (itr->second*rate1)));
+                rates.insert(make_pair(bUnit, map<string, double>()));
+                for (itr = rates[sUnit].begin(); itr != rates[i+sUnit].end(); itr++) {
+                    rates[bUnit].insert(make_pair(itr->first, (itr->second*rate))));
+                    rates[itr->first].insert(make_pair(rates[bUnit], (itr->second*rate1)));
                 }
             }
+
             //0 new units
+            if(!(rates.find(bUnit) == end) && !(rates.find(sUnit) == end)){
+                if(rates[bUnit].find(sUnit == end){
+                    for (itr = rates[sUnit].begin(); itr != rates[i+sUnit].end(); itr++) {
+                        rates[bUnit].insert(make_pair(itr->first, (itr->second*rate))));
+                        rates[itr->first].insert(make_pair(rates[bUnit], (itr->second*rate1)));
+                    }
+                    for (itr = rates[bUnit].begin(); itr != rates[bUnit].end(); itr++) {
+                        rates[sUnit].insert(make_pair(itr->first, (itr->second*rate1))));
+                        rates[itr->first].insert(make_pair(rates[sUnit], (itr->second*rate)));
+                    }
+                }
+            }
         }
     }
 
