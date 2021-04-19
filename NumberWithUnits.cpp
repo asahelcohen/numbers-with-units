@@ -3,13 +3,11 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
 using namespace std;
 
 namespace ariel
 {
-
-    std::map<string type1, map<string type2, double x> rates;
-
     NumberWithUnits::NumberWithUnits(double d, string typo)
     {
         num = d;
@@ -33,65 +31,75 @@ namespace ariel
 
         string line;
         vector<string> tempVector;
-        while(units_file.good){
+        while(units_file.good()){
             getline(units_file, line);
-            if(line.size > 0)
+            if(line.size() > 0)
                 tempVector.push_back(line);
         }
         
         int l = tempVector.size();
 
-        for(int i = 0; i < l; i + 5){
-            double rate = std::stod (tempVector[i+3]);
+        for(uint i = 0; i < l; i += 5){
+            double rate = std::stod (tempVector.at(i+3));
             double rate1 = 1/ rate;
-            string bUnit = tempVector[i+1];
-            string sUnit = tempVector[i+4];
+            string bUnit = tempVector.at(i+1);
+            string sUnit = tempVector.at(i+4);
 
             //2 new units
-            if((rates.find(bUnit) == end) && (rates.find(sUnit) == end)){
+            if((rates.count(bUnit) == 0) && (rates.count(sUnit) == 0)){
                 rates.insert(make_pair(bUnit, map<string, double>()));
-                rates[bUnit].insert(make_pair(sUnit, rate));
+                rates.at(bUnit).insert(make_pair(sUnit, rate));
 
                 rates.insert(make_pair(sUnit, map<string, double>()));
-                rates[bUnit].insert(make_pair(bUnit, rate1)));
+                rates.at(bUnit).insert(make_pair(bUnit, rate1));
             }
 
             //1 new units
-            if(!(rates.find(bUnit) == end) && (rates.find(sUnit) == end)){
-                rates[bUnit].insert(make_pair(sUnit, rate));
+            if((rates.count(bUnit) == 1) && (rates.count(sUnit) == 0)){
+                rates.at(bUnit).insert(make_pair(sUnit, rate));
 
                 rates.insert(make_pair(sUnit, map<string, double>()));
-                for (itr = rates[bUnit].begin(); itr != rates[bUnit].end(); itr++) {
-                    rates[sUnit].insert(make_pair(itr->first, (itr->second*rate1))));
-                    rates[itr->first].insert(make_pair(rates[sUnit], (itr->second*rate)));
+                for(auto itr : rates.at(bUnit)){
+                    rates.at(sUnit).insert(make_pair(itr.first, (itr.second*rate1)));
+                    rates.at(itr.first).insert(make_pair(sUnit, (itr.second*rate)));
                 }
             }
 
-
-            if((rates.find(bUnit) == end) && !(rates.find(sUnit) == end)){
-                rates[bUnit].insert(make_pair(bUnit, rate1));
+            if((rates.count(bUnit) == 0) && (rates.count(sUnit) == 1)){
+                rates.at(sUnit).insert(make_pair(bUnit, rate));
 
                 rates.insert(make_pair(bUnit, map<string, double>()));
-                for (itr = rates[sUnit].begin(); itr != rates[i+sUnit].end(); itr++) {
-                    rates[bUnit].insert(make_pair(itr->first, (itr->second*rate))));
-                    rates[itr->first].insert(make_pair(rates[bUnit], (itr->second*rate1)));
+                for(auto itr : rates.at(sUnit)){
+                    rates.at(bUnit).insert(make_pair(itr.first, (itr.second*rate)));
+                    rates.at(itr.first).insert(make_pair(sUnit, (itr.second*rate1)));
                 }
             }
 
             //0 new units
-            if(!(rates.find(bUnit) == end) && !(rates.find(sUnit) == end)){
-                if(rates[bUnit].find(sUnit == end){
-                    for (itr = rates[sUnit].begin(); itr != rates[i+sUnit].end(); itr++) {
-                        rates[bUnit].insert(make_pair(itr->first, (itr->second*rate))));
-                        rates[itr->first].insert(make_pair(rates[bUnit], (itr->second*rate1)));
+            if((rates.count(bUnit) == 1) && (rates.count(sUnit) == 1)){
+                if(rates.at(bUnit).count(sUnit) == 0){
+                    for(auto itr : rates.at(sUnit)){
+                        rates.at(bUnit).insert(make_pair(itr.first, (itr.second*rate)));
+                        rates.at(itr.first).insert(make_pair(sUnit, (itr.second*rate1)));
                     }
-                    for (itr = rates[bUnit].begin(); itr != rates[bUnit].end(); itr++) {
-                        rates[sUnit].insert(make_pair(itr->first, (itr->second*rate1))));
-                        rates[itr->first].insert(make_pair(rates[sUnit], (itr->second*rate)));
+
+                    for(auto itr : rates.at(bUnit)){
+                        rates.at(sUnit).insert(make_pair(itr.first, (itr.second*rate1)));
+                        rates.at(itr.first).insert(make_pair(sUnit, (itr.second*rate)));
                     }
                 }
             }
         }
+
+        for(auto temp1 :rates){
+            cout << temp1.first ;
+            cout << " its friends:" << endl;
+            for(auto t : rates.at(temp1)){
+                std::cout << t.first << ",";
+            }
+            cout<<endl<<endl;
+        }
+        
     }
 
     NumberWithUnits operator+(NumberWithUnits &a, NumberWithUnits &b)
