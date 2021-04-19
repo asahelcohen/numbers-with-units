@@ -10,7 +10,7 @@ namespace ariel
     NumberWithUnits::NumberWithUnits(double d, string typo)
     {
         num = d;
-        type = typo;
+        type = std::move(typo);
     }
     void NumberWithUnits::read_units(ifstream &units_file)
     {
@@ -73,7 +73,7 @@ namespace ariel
     {
         return *this;
     }
-    const NumberWithUnits NumberWithUnits::operator++(int)
+    NumberWithUnits NumberWithUnits::operator++(int)
     {
         return NumberWithUnits(1, "hi");
     }
@@ -81,7 +81,7 @@ namespace ariel
     {
         return *this;
     }
-    const NumberWithUnits NumberWithUnits::operator--(int)
+    NumberWithUnits NumberWithUnits::operator--(int)
     {
         return NumberWithUnits(1, "hi");
     }
@@ -95,12 +95,12 @@ namespace ariel
         return NumberWithUnits(1, "hi");
     }
 
-    ostream &operator<<(ostream &os, const NumberWithUnits &n)
+    ostream& operator <<  (ostream &os, const NumberWithUnits &f)
     {
-        return os << n.num << "[" << n.type << "]";
+        return os << f.num << "[" << f.type << "]";
     }
 
-    istream &operator>>(istream &is, NumberWithUnits &n)
+    istream& operator >>  (istream &is, NumberWithUnits &f)
     {
         return is;
     }
