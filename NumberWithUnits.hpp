@@ -3,10 +3,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
+#include <map>
 
 namespace ariel
 {
+    std::map<string type1, map<string type2, double x> rates;
+
     class NumberWithUnits
     {
     private:
