@@ -4,6 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <vector>
+#include <string>
 using namespace std;
 
 namespace ariel
@@ -22,84 +23,119 @@ namespace ariel
     // 1 USD = 3.33 ILS
     void NumberWithUnits::read_units(ifstream &units_file)
     {
-        string filename = "units.txt";
-        units_file.open(filename);
+        // string filename = "units.txt";
+        // units_file.open(filename);
 
-        if (!units_file.is_open()){
+        if (!units_file.is_open())
+        {
             exit(EXIT_FAILURE);
         }
 
         string line;
         vector<string> tempVector;
-        while(units_file.good()){
-            getline(units_file, line);
-            if(line.size() > 0)
+        if (units_file.is_open())
+        {
+            while (units_file >> line)
                 tempVector.push_back(line);
         }
-        
+
         int l = tempVector.size();
 
-        for(uint i = 0; i < l; i += 5){
-            double rate = std::stod (tempVector.at(i+3));
-            double rate1 = 1/ rate;
-            string bUnit = tempVector.at(i+1);
-            string sUnit = tempVector.at(i+4);
+        for (uint i = 0; i < l; i += 5)
+        {
+            double rate = std::stod(tempVector.at(i + 3));
+            double rate1 = 1 / rate;
+            string bUnit = tempVector.at(i + 1);
+            string sUnit = tempVector.at(i + 4);
 
             //2 new units
-            if((rates.count(bUnit) == 0) && (rates.count(sUnit) == 0)){
+            if ((rates.count(bUnit) == 0) && (rates.count(sUnit) == 0))
+            {
                 rates.insert(make_pair(bUnit, map<string, double>()));
                 rates.at(bUnit).insert(make_pair(sUnit, rate));
 
                 rates.insert(make_pair(sUnit, map<string, double>()));
-                rates.at(bUnit).insert(make_pair(bUnit, rate1));
+                rates.at(sUnit).insert(make_pair(bUnit, rate1));
             }
 
             //1 new units
-            if((rates.count(bUnit) == 1) && (rates.count(sUnit) == 0)){
-                rates.at(bUnit).insert(make_pair(sUnit, rate));
-
+            if ((rates.count(bUnit) == 1) && (rates.count(sUnit) == 0))
+            {
                 rates.insert(make_pair(sUnit, map<string, double>()));
-                for(auto itr : rates.at(bUnit)){
-                    rates.at(sUnit).insert(make_pair(itr.first, (itr.second*rate1)));
-                    rates.at(itr.first).insert(make_pair(sUnit, (itr.second*rate)));
+                rates.at(sUnit).insert(make_pair(bUnit, rate1));
+                for (auto itr : rates.at(bUnit))
+                {
+                    rates.at(sUnit).insert(make_pair(itr.first, (itr.second * rate1)));
+                    rates.at(itr.first).insert(make_pair(sUnit, (1 / itr.second * rate)));
                 }
+
+                rates.at(bUnit).insert(make_pair(sUnit, rate));
             }
 
-            if((rates.count(bUnit) == 0) && (rates.count(sUnit) == 1)){
-                rates.at(sUnit).insert(make_pair(bUnit, rate));
-
+            if ((rates.count(bUnit) == 0) && (rates.count(sUnit) == 1))
+            {
                 rates.insert(make_pair(bUnit, map<string, double>()));
-                for(auto itr : rates.at(sUnit)){
-                    rates.at(bUnit).insert(make_pair(itr.first, (itr.second*rate)));
-                    rates.at(itr.first).insert(make_pair(sUnit, (itr.second*rate1)));
+                rates.at(bUnit).insert(make_pair(sUnit, rate));
+                for (auto itr : rates.at(sUnit))
+                {
+                    rates.at(bUnit).insert(make_pair(itr.first, (itr.second * rate)));
+                    rates.at(itr.first).insert(make_pair(bUnit, (1 / itr.second * rate1)));
                 }
+
+                rates.at(sUnit).insert(make_pair(bUnit, rate1));
             }
 
             //0 new units
-            if((rates.count(bUnit) == 1) && (rates.count(sUnit) == 1)){
-                if(rates.at(bUnit).count(sUnit) == 0){
-                    for(auto itr : rates.at(sUnit)){
-                        rates.at(bUnit).insert(make_pair(itr.first, (itr.second*rate)));
-                        rates.at(itr.first).insert(make_pair(sUnit, (itr.second*rate1)));
-                    }
+            if ((rates.count(bUnit) == 1) && (rates.count(sUnit) == 1))
+            {
+                if (rates.at(bUnit).count(sUnit) == 0)
+                {
+                    // for (auto itr : rates.at(bUnit))
+                    // {
+                    //     rates.at(sUnit).insert(make_pair(itr.first, (itr.second * rate1)));
+                    //     rates.at(itr.first).insert(make_pair(sUnit, (1 / itr.second * rate)));
+                    // }
 
-                    for(auto itr : rates.at(bUnit)){
-                        rates.at(sUnit).insert(make_pair(itr.first, (itr.second*rate1)));
-                        rates.at(itr.first).insert(make_pair(sUnit, (itr.second*rate)));
+                    // for (auto itr : rates.at(sUnit))
+                    // {
+                    //     rates.at(bUnit).insert(make_pair(itr.first, (itr.second * rate)));
+                    //     rates.at(itr.first).insert(make_pair(bUnit, (1 / itr.second * rate1)));
+                    // }
+                    for (auto itr : rates.at(bUnit))
+                    {
+                        for (auto itr1 : rates.at(sUnit))
+                        {
+                            rates.at(itr.first).insert(make_pair(itr1.first, (1 / itr.second * itr1.second * rate)));
+                            rates.at(itr1.first).insert(make_pair(itr.first, (itr.second * 1 / itr1.second * rate1)));
+                        }
+                        rates.at(sUnit).insert(make_pair(itr.first, itr.second * rate1));
+                        rates.at(itr.first).insert(make_pair(sUnit, 1/itr.second * rate));
                     }
+                    for (auto itr : rates.at(sUnit))
+                    {
+                        rates.at(itr.first).insert(make_pair(bUnit, (1 / itr.second * rate1)));
+                        rates.at(bUnit).insert(make_pair(itr.first, (itr.second * rate)));
+                    }
+                    rates.at(sUnit).insert(make_pair(bUnit, rate1));
+                    rates.at(bUnit).insert(make_pair(sUnit, rate));
                 }
             }
         }
 
-        for(auto temp1 :rates){
-            cout << temp1.first ;
-            cout << " its friends:" << endl;
-            for(auto t : rates.at(temp1)){
-                std::cout << t.first << ",";
+        for (auto temp1 : rates)
+        {
+            cout << " main:" << temp1.first << endl;
+            for (auto t : rates.at(temp1.first))
+            {
+                cout << "  " << t.first << "   "
+                     << "value: " << t.second << endl;
             }
-            cout<<endl<<endl;
+            cout << endl
+                 << endl;
         }
-        
+        cout << endl
+             << endl
+             << endl;
     }
 
     NumberWithUnits operator+(NumberWithUnits &a, NumberWithUnits &b)
@@ -110,11 +146,11 @@ namespace ariel
     {
         return a;
     }
-    NumberWithUnits& NumberWithUnits::operator+=(const NumberWithUnits &a)
+    NumberWithUnits &NumberWithUnits::operator+=(const NumberWithUnits &a)
     {
         return *this;
     }
-    NumberWithUnits& NumberWithUnits::operator-=(const NumberWithUnits &a)
+    NumberWithUnits &NumberWithUnits::operator-=(const NumberWithUnits &a)
     {
         return *this;
     }
@@ -179,22 +215,21 @@ namespace ariel
 
     NumberWithUnits operator*(const NumberWithUnits &a, const double d)
     {
-        return NumberWithUnits(a.num*d, a.type);
+        return NumberWithUnits(a.num * d, a.type);
     }
     NumberWithUnits operator*(const double d, const NumberWithUnits &a)
     {
-        return NumberWithUnits(a.num*d, a.type);
+        return NumberWithUnits(a.num * d, a.type);
     }
 
-    ostream& operator <<  (ostream &os, const NumberWithUnits &f)
+    ostream &operator<<(ostream &os, const NumberWithUnits &f)
     {
         return os << f.num << "[" << f.type << "]";
     }
 
-    istream& operator >>  (istream &is, NumberWithUnits &f)
+    istream &operator>>(istream &is, NumberWithUnits &f)
     {
         return is;
     }
-
 
 }

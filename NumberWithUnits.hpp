@@ -4,10 +4,11 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+using namespace std;
 
 namespace ariel
 {
-    std::map<string type1, map<string type2, double x> rates;
+    std::map<string, map<string, double>> rates;
 
     class NumberWithUnits
     {
