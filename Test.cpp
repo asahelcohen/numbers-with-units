@@ -344,17 +344,6 @@ TEST_CASE("operator++/--")
     CHECK(h1++ != h1);
 }
 
-TEST_CASE("throw")
-{
-    CHECK_THROWS(km1 + g1);
-    CHECK_THROWS(il2 + g1);
-    CHECK_THROWS(km1 + us3);
-    CHECK_THROWS(m1 + g1);
-    CHECK_THROWS(cm2 + t1);
-    CHECK_THROWS(km1 + g1);
-    CHECK_THROWS(h1 + t1);
-}
-
 TEST_CASE("operator+ mix")
 {
     NumberWithUnits temp = NumberWithUnits(586.14, "m");
@@ -537,4 +526,15 @@ TEST_CASE("operator*")
     CHECK(25.6 * us1 == temp);
     temp = NumberWithUnits(24219.5, "ILS");
     CHECK(29.5 * il1 == temp);
+}
+
+TEST_CASE("throw")
+{
+    CHECK_THROWS(km1 + g1);
+    CHECK_THROWS(il2 + g1);
+    CHECK_THROWS(km1 + us3);
+    CHECK_THROWS(m1 + g1);
+    CHECK_THROWS(cm2 + t1);
+    CHECK_THROWS(km1 + g1);
+    CHECK_THROWS(h1 + t1);
 }

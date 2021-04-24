@@ -23,9 +23,6 @@ namespace ariel
     // 1 USD = 3.33 ILS
     void NumberWithUnits::read_units(ifstream &units_file)
     {
-        // string filename = "units.txt";
-        // units_file.open(filename);
-
         if (!units_file.is_open())
         {
             exit(EXIT_FAILURE);
@@ -90,17 +87,6 @@ namespace ariel
             {
                 if (rates.at(bUnit).count(sUnit) == 0)
                 {
-                    // for (auto itr : rates.at(bUnit))
-                    // {
-                    //     rates.at(sUnit).insert(make_pair(itr.first, (itr.second * rate1)));
-                    //     rates.at(itr.first).insert(make_pair(sUnit, (1 / itr.second * rate)));
-                    // }
-
-                    // for (auto itr : rates.at(sUnit))
-                    // {
-                    //     rates.at(bUnit).insert(make_pair(itr.first, (itr.second * rate)));
-                    //     rates.at(itr.first).insert(make_pair(bUnit, (1 / itr.second * rate1)));
-                    // }
                     for (auto itr : rates.at(bUnit))
                     {
                         for (auto itr1 : rates.at(sUnit))
@@ -109,7 +95,7 @@ namespace ariel
                             rates.at(itr1.first).insert(make_pair(itr.first, (itr.second * 1 / itr1.second * rate1)));
                         }
                         rates.at(sUnit).insert(make_pair(itr.first, itr.second * rate1));
-                        rates.at(itr.first).insert(make_pair(sUnit, 1/itr.second * rate));
+                        rates.at(itr.first).insert(make_pair(sUnit, 1 / itr.second * rate));
                     }
                     for (auto itr : rates.at(sUnit))
                     {
@@ -122,36 +108,90 @@ namespace ariel
             }
         }
 
-        for (auto temp1 : rates)
-        {
-            cout << " main:" << temp1.first << endl;
-            for (auto t : rates.at(temp1.first))
-            {
-                cout << "  " << t.first << "   "
-                     << "value: " << t.second << endl;
-            }
-            cout << endl
-                 << endl;
-        }
-        cout << endl
-             << endl
-             << endl;
+        //     for (auto temp1 : rates)
+        //     {
+        //         cout << " main:" << temp1.first << endl;
+        //         for (auto t : rates.at(temp1.first))
+        //         {
+        //             cout << "  " << t.first << "   "
+        //                  << "value: " << t.second << endl;
+        //         }
+        //         cout << endl
+        //              << endl;
+        //     }
+        //     cout << endl
+        //          << endl
+        //          << endl;
     }
 
     NumberWithUnits operator+(NumberWithUnits &a, NumberWithUnits &b)
     {
+        if (a.type == b.type)
+        {
+            return NumberWithUnits(a.num + b.num, a.type);
+        }
+        if (rates.count(a.type) == 1)
+        {
+            if (rates.at(a.type).count(b.type) == 1)
+            {
+                double temp = (b.num / rates.at(a.type).at(b.type));
+                return NumberWithUnits(a.num + temp, a.type);
+            }
+        }
+
         return a;
     }
     NumberWithUnits operator-(NumberWithUnits &a, NumberWithUnits &b)
     {
+        if (a.type == b.type)
+        {
+            return NumberWithUnits(a.num - b.num, a.type);
+        }
+        if (rates.count(a.type) == 1)
+        {
+            if (rates.at(a.type).count(b.type) == 1)
+            {
+                double temp = (b.num / rates.at(a.type).at(b.type));
+                return NumberWithUnits(a.num - temp, a.type);
+            }
+        }
+
         return a;
     }
     NumberWithUnits &NumberWithUnits::operator+=(const NumberWithUnits &a)
     {
+        if (a.type == type)
+        {
+            num += a.num;
+            return *this;
+        }
+        if (rates.count(a.type) == 1)
+        {
+            if (rates.at(a.type).count(type) == 1)
+            {
+                num += (a.num / rates.at(a.type).at(type));
+                return *this;
+            }
+        }
+
         return *this;
     }
     NumberWithUnits &NumberWithUnits::operator-=(const NumberWithUnits &a)
     {
+        if (a.type == type)
+        {
+            num -= a.num;
+            return *this;
+        }
+        if (rates.count(a.type) == 1)
+        {
+            if (rates.at(a.type).count(type) == 1)
+            {
+                num -= (a.num / rates.at(a.type).at(type));
+                return *this;
+            }
+        }
+
         return *this;
     }
     NumberWithUnits operator+(const NumberWithUnits &a)
@@ -160,32 +200,91 @@ namespace ariel
     }
     NumberWithUnits operator-(const NumberWithUnits &a)
     {
-        return a;
+        NumberWithUnits temp = NumberWithUnits(-a.num, a.type);
+        return temp;
     }
 
     bool NumberWithUnits::operator==(const NumberWithUnits &a) const
     {
-        return true;
+        if (a.type == type)
+        {
+            if (a.num == num)
+            {
+                return true;
+            }
+            return false;
+        }
+        if (rates.count(a.type) == 1)
+        {
+            if (rates.at(a.type).count(type) == 1)
+            {
+                if (num == (a.num / rates.at(a.type).at(type)))
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        return false;
     }
     bool NumberWithUnits::operator!=(const NumberWithUnits &a) const
     {
-        return true;
+        return !(*this == a);
     }
     bool NumberWithUnits::operator>=(const NumberWithUnits &a) const
     {
-        return true;
+        return !(*this < a);
     }
     bool NumberWithUnits::operator<=(const NumberWithUnits &a) const
     {
-        return true;
+        return !(*this > a);
     }
     bool NumberWithUnits::operator>(const NumberWithUnits &a) const
     {
-        return true;
+        if (a.type == type)
+        {
+            if (num > a.num)
+            {
+                return true;
+            }
+            return false;
+        }
+        if (rates.count(a.type) == 1)
+        {
+            if (rates.at(a.type).count(type) == 1)
+            {
+                if (num > (a.num / rates.at(a.type).at(type)))
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+        return false;
     }
     bool NumberWithUnits::operator<(const NumberWithUnits &a) const
     {
-        return true;
+        if (a.type == type)
+        {
+            if (num < a.num)
+            {
+                return true;
+            }
+            return false;
+        }
+        if (rates.count(a.type) == 1)
+        {
+            if (rates.at(a.type).count(type) == 1)
+            {
+                if (num < (a.num / rates.at(a.type).at(type)))
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+        return false;
     }
 
     NumberWithUnits &NumberWithUnits::operator++()

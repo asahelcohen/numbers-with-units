@@ -8,7 +8,7 @@ using namespace std;
 
 namespace ariel
 {
-    std::map<string, map<string, double>> rates;
+    static std::map<string, map<string, double>> rates;
 
     class NumberWithUnits
     {
@@ -18,7 +18,7 @@ namespace ariel
 
     public:
         NumberWithUnits(double d, std::string typo);
-        
+
         static void read_units(std::ifstream&);
 
         friend NumberWithUnits operator+(NumberWithUnits &a, NumberWithUnits &b);
