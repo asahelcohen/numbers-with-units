@@ -124,7 +124,7 @@ namespace ariel
         //          << endl;
     }
 
-    NumberWithUnits operator+(NumberWithUnits &a, NumberWithUnits &b)
+    NumberWithUnits operator+(const NumberWithUnits &a, const NumberWithUnits &b)
     {
         if (a.type == b.type)
         {
@@ -141,7 +141,7 @@ namespace ariel
 
         return a;
     }
-    NumberWithUnits operator-(NumberWithUnits &a, NumberWithUnits &b)
+    NumberWithUnits operator-(const NumberWithUnits &a, const NumberWithUnits &b)
     {
         if (a.type == b.type)
         {
@@ -208,24 +208,15 @@ namespace ariel
     {
         if (a.type == type)
         {
-            if (a.num == num)
-            {
-                return true;
-            }
-            return false;
+            return(a.num == num);
         }
         if (rates.count(a.type) == 1)
         {
             if (rates.at(a.type).count(type) == 1)
             {
-                if (num == (a.num / rates.at(a.type).at(type)))
-                {
-                    return true;
-                }
-                return false;
+                return(num == (a.num / rates.at(a.type).at(type)));
             }
         }
-
         return false;
     }
     bool NumberWithUnits::operator!=(const NumberWithUnits &a) const
@@ -330,5 +321,4 @@ namespace ariel
     {
         return is;
     }
-
 }

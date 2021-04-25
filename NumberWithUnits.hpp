@@ -21,8 +21,8 @@ namespace ariel
 
         static void read_units(std::ifstream&);
 
-        friend NumberWithUnits operator+(NumberWithUnits &a, NumberWithUnits &b);
-        friend NumberWithUnits operator-(NumberWithUnits &a, NumberWithUnits &b);
+        friend NumberWithUnits operator+(const NumberWithUnits &a, const NumberWithUnits &b);
+        friend NumberWithUnits operator-(const NumberWithUnits &a, const NumberWithUnits &b);
         NumberWithUnits& operator+=(const NumberWithUnits &a);
         NumberWithUnits& operator-=(const NumberWithUnits &a);
         friend NumberWithUnits operator+(const NumberWithUnits &a);
