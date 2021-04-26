@@ -18,7 +18,9 @@ int main() {
   ifstream units_file{"units.txt"};
   NumberWithUnits::read_units(units_file);
 
-
+  bool flag = (NumberWithUnits(1,"day")>NumberWithUnits(60*24,"min"));
+  cout << boolalpha; // print booleans as strings from now on:
+  cout << flag << "here";
   NumberWithUnits a{2, "km"};   // 2 kilometers
   cout << a << endl;           // Prints "2[km]".
   cout << (-a) << endl;    // Prints "-2[km]"

@@ -43,8 +43,8 @@ namespace ariel
         friend NumberWithUnits operator*(const NumberWithUnits &a, const double d);
         friend NumberWithUnits operator*(const double d, const NumberWithUnits &a);
 
-        friend std::ostream& operator <<	(std::ostream &os, const NumberWithUnits &f);
-		friend std::istream& operator >>	(std::istream &is, NumberWithUnits &f);
+        friend std::ostream& operator <<	(std::ostream &os, const NumberWithUnits &unit);
+		friend std::istream& operator >>	(std::istream &is, NumberWithUnits &unit);
 
 
         ~NumberWithUnits(){};

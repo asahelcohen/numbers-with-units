@@ -11,8 +11,12 @@ namespace ariel
 {
     NumberWithUnits::NumberWithUnits(double d, string typo)
     {
+        if (rates.count(typo) != 1)
+        {
+            throw invalid_argument("unit does not exist");
+        }
         num = d;
-        type = std::move(typo);
+        type = std::move(typo);    
     }
     // 1 km = 1000 m
     // 1 m = 100 cm
@@ -33,12 +37,14 @@ namespace ariel
         if (units_file.is_open())
         {
             while (units_file >> line)
+            {
                 tempVector.push_back(line);
+            }
         }
 
         int l = tempVector.size();
-
-        for (uint i = 0; i < l; i += 5)
+        const uint five = 5;
+        for (uint i = 0; i < l; i += five)
         {
             double rate = std::stod(tempVector.at(i + 3));
             double rate1 = 1 / rate;
@@ -60,7 +66,7 @@ namespace ariel
             {
                 rates.insert(make_pair(sUnit, map<string, double>()));
                 rates.at(sUnit).insert(make_pair(bUnit, rate1));
-                for (auto itr : rates.at(bUnit))
+                for (auto const &itr : rates.at(bUnit))
                 {
                     rates.at(sUnit).insert(make_pair(itr.first, (itr.second * rate1)));
                     rates.at(itr.first).insert(make_pair(sUnit, (1 / itr.second * rate)));
@@ -73,7 +79,7 @@ namespace ariel
             {
                 rates.insert(make_pair(bUnit, map<string, double>()));
                 rates.at(bUnit).insert(make_pair(sUnit, rate));
-                for (auto itr : rates.at(sUnit))
+                for (auto const &itr : rates.at(sUnit))
                 {
                     rates.at(bUnit).insert(make_pair(itr.first, (itr.second * rate)));
                     rates.at(itr.first).insert(make_pair(bUnit, (1 / itr.second * rate1)));
@@ -87,9 +93,9 @@ namespace ariel
             {
                 if (rates.at(bUnit).count(sUnit) == 0)
                 {
-                    for (auto itr : rates.at(bUnit))
+                    for (auto const &itr : rates.at(bUnit))
                     {
-                        for (auto itr1 : rates.at(sUnit))
+                        for (auto const &itr1 : rates.at(sUnit))
                         {
                             rates.at(itr.first).insert(make_pair(itr1.first, (1 / itr.second * itr1.second * rate)));
                             rates.at(itr1.first).insert(make_pair(itr.first, (itr.second * 1 / itr1.second * rate1)));
@@ -97,7 +103,7 @@ namespace ariel
                         rates.at(sUnit).insert(make_pair(itr.first, itr.second * rate1));
                         rates.at(itr.first).insert(make_pair(sUnit, 1 / itr.second * rate));
                     }
-                    for (auto itr : rates.at(sUnit))
+                    for (auto const &itr : rates.at(sUnit))
                     {
                         rates.at(itr.first).insert(make_pair(bUnit, (1 / itr.second * rate1)));
                         rates.at(bUnit).insert(make_pair(itr.first, (itr.second * rate)));
@@ -138,8 +144,7 @@ namespace ariel
                 return NumberWithUnits(a.num + temp, a.type);
             }
         }
-
-        return a;
+        throw invalid_argument("Units do not match - " + b.type + " cannot be converted to " + a.type + "");
     }
     NumberWithUnits operator-(const NumberWithUnits &a, const NumberWithUnits &b)
     {
@@ -155,8 +160,7 @@ namespace ariel
                 return NumberWithUnits(a.num - temp, a.type);
             }
         }
-
-        return a;
+        throw invalid_argument("Units do not match - " + b.type + " cannot be converted to " + a.type + "");
     }
     NumberWithUnits &NumberWithUnits::operator+=(const NumberWithUnits &a)
     {
@@ -169,12 +173,11 @@ namespace ariel
         {
             if (rates.at(a.type).count(type) == 1)
             {
-                num += (a.num / rates.at(a.type).at(type));
+                num += (a.num * rates.at(a.type).at(type));
                 return *this;
             }
         }
-
-        return *this;
+        throw invalid_argument("Units do not match - " + a.type + " cannot be converted to " + type + "");
     }
     NumberWithUnits &NumberWithUnits::operator-=(const NumberWithUnits &a)
     {
@@ -187,12 +190,11 @@ namespace ariel
         {
             if (rates.at(a.type).count(type) == 1)
             {
-                num -= (a.num / rates.at(a.type).at(type));
+                num -= (a.num * rates.at(a.type).at(type));
                 return *this;
             }
         }
-
-        return *this;
+        throw invalid_argument("Units do not match - " + a.type + " cannot be converted to " + type + "");
     }
     NumberWithUnits operator+(const NumberWithUnits &a)
     {
@@ -206,18 +208,19 @@ namespace ariel
 
     bool NumberWithUnits::operator==(const NumberWithUnits &a) const
     {
+        const double eps = 0.0001;
         if (a.type == type)
         {
-            return(a.num == num);
+            return (abs(a.num - num) <= eps);
         }
         if (rates.count(a.type) == 1)
         {
             if (rates.at(a.type).count(type) == 1)
             {
-                return(num == (a.num / rates.at(a.type).at(type)));
+                return (abs(num - (a.num * rates.at(a.type).at(type))) <= eps);
             }
         }
-        return false;
+        throw invalid_argument("Units do not match - " + a.type + " cannot be converted to " + type + "");
     }
     bool NumberWithUnits::operator!=(const NumberWithUnits &a) const
     {
@@ -235,47 +238,37 @@ namespace ariel
     {
         if (a.type == type)
         {
-            if (num > a.num)
-            {
-                return true;
-            }
-            return false;
+            return (num > a.num);
         }
         if (rates.count(a.type) == 1)
         {
             if (rates.at(a.type).count(type) == 1)
             {
-                if (num > (a.num / rates.at(a.type).at(type)))
-                {
-                    return true;
+                if(*this == a){
+                    return false;
                 }
-                return false;
+                return (num > (a.num * rates.at(a.type).at(type)));
             }
         }
-        return false;
+        throw invalid_argument("Units do not match - " + a.type + " cannot be converted to " + type + "");
     }
     bool NumberWithUnits::operator<(const NumberWithUnits &a) const
     {
         if (a.type == type)
         {
-            if (num < a.num)
-            {
-                return true;
-            }
-            return false;
+            return (num < a.num);
         }
         if (rates.count(a.type) == 1)
         {
             if (rates.at(a.type).count(type) == 1)
             {
-                if (num < (a.num / rates.at(a.type).at(type)))
-                {
-                    return true;
+                if(*this == a){
+                    return false;
                 }
-                return false;
+                return (num < (a.num * rates.at(a.type).at(type)));
             }
         }
-        return false;
+        throw invalid_argument("Units do not match - " + a.type + " cannot be converted to " + type + "");
     }
 
     NumberWithUnits &NumberWithUnits::operator++()
@@ -285,10 +278,9 @@ namespace ariel
     }
     NumberWithUnits NumberWithUnits::operator++(int)
     {
-        double numTemp = num + 1;
-        string typeTemp = type;
+        double numTemp = num;
         num += 1;
-        return NumberWithUnits(numTemp, typeTemp);
+        return NumberWithUnits(numTemp, type);
     }
     NumberWithUnits &NumberWithUnits::operator--()
     {
@@ -297,10 +289,9 @@ namespace ariel
     }
     NumberWithUnits NumberWithUnits::operator--(int)
     {
-        double numTemp = num - 1;
-        string typeTemp = type;
+        double numTemp = num;
         num -= 1;
-        return NumberWithUnits(numTemp, typeTemp);
+        return NumberWithUnits(numTemp, type);
     }
 
     NumberWithUnits operator*(const NumberWithUnits &a, const double d)
@@ -312,13 +303,34 @@ namespace ariel
         return NumberWithUnits(a.num * d, a.type);
     }
 
-    ostream &operator<<(ostream &os, const NumberWithUnits &f)
+    ostream &operator<<(ostream &os, const NumberWithUnits &unit)
     {
-        return os << f.num << "[" << f.type << "]";
+        return os << unit.num << "[" << unit.type << "]";
     }
 
-    istream &operator>>(istream &is, NumberWithUnits &f)
+    istream &operator>>(istream &is, NumberWithUnits &unit)
     {
+        string type = "/0";
+        double value = 1;
+        char braket1 = 0;
+        char braket2 = 0;
+
+        is >> skipws >> value >> braket1 >> type;
+        unit.num = value;
+        if (type.at(type.length() - 1) == ']')
+        {
+            type = type.substr(0, type.length() - 1);
+        }
+        else
+        {
+            is >> skipws >> braket2;
+        }
+        
+        unit.type = type;
+
+        if (rates.count(type) == 0){ throw invalid_argument("unit does not exist");}
+
+
         return is;
     }
 }
