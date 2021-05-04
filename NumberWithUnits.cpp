@@ -9,6 +9,25 @@ using namespace std;
 
 namespace ariel
 {
+    void printTable()
+    {
+        cout << " ______________________________________________________";
+        for (auto temp1 : rates)
+        {
+            cout << " _____  Main unit type: " << temp1.first << "____" << endl;
+            for (auto t : rates.at(temp1.first))
+            {
+                cout << " second unit: " << t.first << "   "
+                     << "value: " << t.second << endl;
+            }
+            cout << endl
+                 << endl;
+        }
+        cout << " ______________________________________________________" << endl
+             << endl
+             << endl;
+    }
+
     NumberWithUnits::NumberWithUnits(double d, string typo)
     {
         if (rates.count(typo) != 1)
@@ -16,15 +35,9 @@ namespace ariel
             throw invalid_argument("unit does not exist");
         }
         num = d;
-        type = std::move(typo);    
+        type = std::move(typo);
     }
-    // 1 km = 1000 m
-    // 1 m = 100 cm
-    // 1 kg = 1000 g
-    // 1 ton = 1000 kg
-    // 1 hour = 60 min
-    // 1 min = 60 sec
-    // 1 USD = 3.33 ILS
+
     void NumberWithUnits::read_units(ifstream &units_file)
     {
         if (!units_file.is_open())
@@ -113,21 +126,7 @@ namespace ariel
                 }
             }
         }
-
-        //     for (auto temp1 : rates)
-        //     {
-        //         cout << " main:" << temp1.first << endl;
-        //         for (auto t : rates.at(temp1.first))
-        //         {
-        //             cout << "  " << t.first << "   "
-        //                  << "value: " << t.second << endl;
-        //         }
-        //         cout << endl
-        //              << endl;
-        //     }
-        //     cout << endl
-        //          << endl
-        //          << endl;
+        printTable();
     }
 
     NumberWithUnits operator+(const NumberWithUnits &a, const NumberWithUnits &b)
@@ -244,7 +243,8 @@ namespace ariel
         {
             if (rates.at(a.type).count(type) == 1)
             {
-                if(*this == a){
+                if (*this == a)
+                {
                     return false;
                 }
                 return (num > (a.num * rates.at(a.type).at(type)));
@@ -262,7 +262,8 @@ namespace ariel
         {
             if (rates.at(a.type).count(type) == 1)
             {
-                if(*this == a){
+                if (*this == a)
+                {
                     return false;
                 }
                 return (num < (a.num * rates.at(a.type).at(type)));
@@ -325,11 +326,13 @@ namespace ariel
         {
             is >> skipws >> braket2;
         }
-        
+
         unit.type = type;
 
-        if (rates.count(type) == 0){ throw invalid_argument("unit does not exist");}
-
+        if (rates.count(type) == 0)
+        {
+            throw invalid_argument("unit does not exist");
+        }
 
         return is;
     }
