@@ -11,7 +11,7 @@ namespace ariel
 {
     void printTable()
     {
-        cout << " ______________________________________________________";
+        cout << endl << " ______________________________________________________" << endl << endl;
         for (auto temp1 : rates)
         {
             cout << " _____  Main unit type: " << temp1.first << "____" << endl;
